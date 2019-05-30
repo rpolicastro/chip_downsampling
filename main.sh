@@ -16,4 +16,4 @@ source settings.conf
 
 ## downsampling BAM
 
-
+READS=$(samtools flagstat $BAM | awk 'NR==1' | cut -d" " -f1)
