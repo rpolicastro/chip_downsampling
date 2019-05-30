@@ -64,3 +64,14 @@ else
 	--outdir ${WORKDIR}/results/sampled_peaks \
 	-n ${SAMPLE}_sampled_$(basename $BAM .bam)
 fi
+
+## Annotating BAM fragments against Peaks
+## --------------------------------------
+
+Rscript ./bin/annotate_fragments.R \
+-d ${WORKDIR} \
+-p ${WORKDIR}/results/sampled_peaks/${SAMPLE}_sampled_$(basename $BAM .bam)_peaks.narrowPeak \
+-b ${WORKDIR}/results/sampled_bams/${SAMPLE}_sampled_$(basename $BAM) \
+-e $PAIRED
+
+
