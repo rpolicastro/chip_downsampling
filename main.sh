@@ -9,7 +9,7 @@
 
 ## activating environment
 
-#source activate chip-downsampling
+source activate chip-downsampling
 
 ## loading settings
 
