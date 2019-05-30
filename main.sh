@@ -9,7 +9,7 @@
 
 ## activating environment
 
-source activate chip-downsampling
+conda activate chip-downsampling
 
 ## loading settings
 
