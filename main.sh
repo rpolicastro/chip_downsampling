@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source settings.conf
-
 #####################
 ## RIF Like Analysis
 #####################
@@ -11,7 +9,7 @@ source settings.conf
 
 ## activating environment
 
-source active chip-downsampling
+source activate chip-downsampling
 
 ## loading settings
 
