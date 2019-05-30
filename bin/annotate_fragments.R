@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 
-library("tidyverse")
 library("getopt")
 library("Rsubread")
 
@@ -22,10 +21,10 @@ print(opt)
 
 ## preparing peaks file as annotation
 
-peaks <- read.delim(opt$peaks, header=TRUE, sep="\t") %>%
-	select(4, 1, 2, 3, 6) %>%
-	rename("GeneID"=1, "Chr"=2, "Start"=3, "End"=4, "Strand"=5) %>%
-	mutate("Strand"="*")
+peaks <- read.delim(opt$peaks, header=TRUE, sep="\t")
+peaks <- peaks[,c(4,1,2,3,6)]
+colnames(peaks) <- c("GeneID", "Chr", "Start", "End", "Strand")
+peaks$Strand <- "*"
 
 ## annotating bam fragments to ChEC-seq peaks
 
@@ -60,11 +59,14 @@ if (opt$paired == "TRUE") {
 
 dir.create(file.path(opt$workdir, "results", "bam_annotation"))
 
-annotation.stats <- annotation.results$stat %>%
-	rename("stats"=1, "count"=2) %>%
-	mutate(frac=count/sum(count))
+annotation.stats <- annotation.results$stat
+colnames(annotation.stats) <- c("stats", "counts")
+annotation.stats$frac <- annotation.stats$count / sum(annotation.stats$count)
 
-outname <- basename(opt$bam) %>% substr(., 1, nchar(.)-4) %>% paste0(., ".tsv")
+outname <- basename(opt$bam)
+outname <- substr(outname, 1, nchar(outname)-4)
+outname <- paste0(outname, ".tsv")
+
 write.table(
 	annotation.stats, file.path(opt$workdir, "results", "bam_annotation", outname),
 	sep="\t", col.names=TRUE, row.names=FALSE, na="", quote=FALSE
