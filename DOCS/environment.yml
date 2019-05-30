@@ -1,4 +1,4 @@
-name: chip-donwsampling
+name: chip-downsampling
 channels:
   - conda-forge
   - bioconda
