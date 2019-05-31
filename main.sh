@@ -77,8 +77,8 @@ done
 ## --------------------------------------
 
 Rscript ./bin/annotate_fragments.R \
--d ${WORKDIR} \
--b ${WORKDIR}/results/sampled_bams/${SAMPLE}_sampled_$(basename $BAM) \
+-d $WORKDIR \
+-b $BAM \
 -e $PAIRED \
 -f $FROM \
 -t $TO \

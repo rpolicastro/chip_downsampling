@@ -15,7 +15,6 @@ options <- matrix(c(
 ), byrow=TRUE, ncol=5)
 
 opt <- getopt(options)
-print(opt)
 
 ###########################
 ## Annotating BAM Fragments
@@ -23,7 +22,7 @@ print(opt)
 
 ## getting sampling info
 
-samples <- seq(as.numeric(from), as.numeric(to), as.numeric(by))
+samples <- seq(as.numeric(opt$from), as.numeric(opt$to), as.numeric(opt$by))
 
 ## preparing peaks file as annotation
 
@@ -31,8 +30,8 @@ options(scipen=999)
 
 peaks <- list()
 for (sample in samples) {
-	peak.file <- list.files(file.path(workdir, "results", "sampled_peaks"), pattern=paste0(sample,"_.+narrowPeak"))
-	peak.data <- read.delim(file.path(workdir, "results", "sampled_peaks", peak.file), header=FALSE, sep="\t")
+	peak.file <- list.files(file.path(opt$workdir, "results", "sampled_peaks"), pattern=paste0("^",sample,"_.+narrowPeak"))
+	peak.data <- read.delim(file.path(opt$workdir, "results", "sampled_peaks", peak.file), header=FALSE, sep="\t")
 	peak.data <- peak.data[,c(4,1,2,3,6)]
 	colnames(peak.data) <- c("GeneID", "Chr", "Start", "End", "Strand")
 	peak.data$Strand <- "*"
@@ -45,7 +44,7 @@ dir.create(file.path(opt$workdir, "results", "bam_annotation"))
 
 fractions <- data.frame()
 for (sample in samples) {
-	bam.file <- file.path(workdir, "results", "sampled_bams", paste0(sample, "_sampled_", basename(opt$bam))) 
+	bam.file <- file.path(opt$workdir, "results", "sampled_bams", paste0(sample, "_sampled_", basename(opt$bam))) 
 	
 	# annotating fragments
 	if (opt$paired == "TRUE") {
@@ -102,6 +101,6 @@ for (sample in samples) {
 
 # exporting data from master data.frame
 write.table(
-	fractions, file.path(workdir, "results", "bam_annotation", "sampling_results.tsv"),
+	fractions, file.path(opt$workdir, "results", "bam_annotation", "sampling_results.tsv"),
 	sep="\t", col.names=TRUE, row.names=FALSE, quote=FALSE, na=""
 )
