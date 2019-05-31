@@ -78,8 +78,9 @@ done
 
 Rscript ./bin/annotate_fragments.R \
 -d ${WORKDIR} \
--p ${WORKDIR}/results/sampled_peaks/${SAMPLE}_sampled_$(basename $BAM .bam)_peaks.narrowPeak \
 -b ${WORKDIR}/results/sampled_bams/${SAMPLE}_sampled_$(basename $BAM) \
--e $PAIRED
-
+-e $PAIRED \
+-f $FROM \
+-t $TO \
+-y $BY
 
