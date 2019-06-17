@@ -2,7 +2,7 @@
 Calculating FRiP for ChIP-seq or ChEC-seq data at various downsampled read numbers.
 
 # About
-This workflow uses software from a conda environment to downsample reads, call peaks, and then get number of reads in peaks. This information is useful in assessing background signal, as well as sequencing saturation for ChIP-seq and ChEC-seq samples.
+This workflow uses software from a containerized conda environment to downsample reads, call peaks, and then get number of reads in peaks. This information is useful in assessing background signal, as well as sequencing saturation for ChIP-seq and ChEC-seq samples.
 
 # Getting Started
 
@@ -10,37 +10,9 @@ This workflow uses software from a conda environment to downsample reads, call p
 
 To get started, you must first clone the FRiP repository. Navigate to a directory you would like to clone the repository to and enter `git clone https://github.com/rpolicastro/chip_downsampling.git`.
 
-## Preparing Conda Environment
+## Installing Singularity
 
-This workflow takes advantage of the [conda](https://conda.io/en/latest/) package manager and virtual environment. The conda package manager installs both the main software and all dependencies into a 'virtual environment' to ensure compatabilty. Additionally, the provided 'environments.yml' file can be used to install the same major software versions as used to develop the script, ensuring prolonged compatability and reproducibility.
-
-Before creating the environment, you must first install miniconda.
-1. [Install miniconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html?highlight=conda), and make sure that conda is in your PATH.
-2. Update conda to the latest version `conda update -n base -c defaults conda`.
-
-You are now ready to create the virtual sofware environment, and download all software and dependencies. It is recommended to reproduce the environment used when creating the script, but instructions on installing the latest software are provided as an alternative.
-
-#### Reproducing the Development Environment (Recommended)
-
-To install the major software versions used when developing this script, navigate to the 'DOCS' directory, and use the provided 'environments.yml' file to create your conda environment.
-```
-conda env create -f environment.yml
-```
-For posterity, *all* software and versions used when developing the script are provided in the 'development_environment.yml' file located in the 'DOCS' directory for the repository. This file can *not* be used to install the environment on your computer, because many of the dependencies and software builds are system specific. However, this file may help you troubleshoot any dependency errors that may occur in your environment.
-
-#### Installing The Latest Software Versions
-
-1. Create the new environment and specify the software to include in it.
-```
-conda create -n chip-downsampling -c conda-forge -c bioconda \
-r-getopt samtools bioconductor-rsubread macs2
-```
-2. Update the software to the latest compatible versions.
-```
-conda update -n chipseq-automation -y -c conda-forge -c bioconda --all
-```
-
-If you wish to use any of the software in the environment outside of the workflow you can type `conda activate chip-downsampling`. You can deactivate the environment by closing your terminal or entering `conda deactivate`.
+Singularity containers are self contained 'boxes' that house the software and other files necessary for the workflow. The container itself will automatically be downloaded, but you must have the Singularity software installed to both download and use the container. Please refer to the [documentation](https://www.sylabs.io/docs/) on their website.
 
 ## Specifying Run Settings
 
@@ -48,6 +20,7 @@ The last step is to set a few settings in the 'settings.conf' file in the main r
 
  Setting | Description |
 | ------- | ----------- |
+|REPDIR|Main repository directory.|
 |WORDKIR|Directory where outputs will be saved.|
 |BAM|Path and file name of input BAM.|
 |PAIRED|Whether the BAM is paired end or not (TRUE/FALSE).|
@@ -59,13 +32,32 @@ The last step is to set a few settings in the 'settings.conf' file in the main r
 
 ## Running the Workflow
 
-After getting the conda environment ready, the sample sheet prepared, and the settings specified, you are now ready to run the workflow. Navigate to the main directory and enter 'bash main.sh'.
+After getting singularity installed, and the settings specified, you are now ready to run the workflow. Navigate to the main directory and enter 'bash main.sh'.
+
+##### Notes for IU Folks
+If you wish to submit the workflow to a compute node, you can do so by submitting it through the TORQUE resource manager. Navigate to the directory that contains both your 'settings.conf' and 'main.sh' files. Create a file called **submit_workflow.sh** with the following contents:
+
+```
+#!/bin/bash
+
+## Navigate back to directory containing the 'main.sh' and 'settings.conf' file.
+cd $PBS_O_WORKDIR
+
+## Load the singularity module on Carbonate/Karst
+module load singularity/3.2.0
+
+## Start the workflow
+bash main.sh
+```
+
+You can now submit the workflow.`qsub -l nodes=1:ppn=8,vmem=64gb,walltime=12:00:00 submit_workflow.sh`. 'ppn' specifies the threads/cores, and 'vmem' is the virtual memory.
 
 # Built With
 
 This workflow would not be possible without the great software listed below.
 
 - [Anaconda](https://www.anaconda.com/) - Software package manager and virtual environment.
+- [Singularity](https://www.sylabs.io/docs/) - Containerize sofware and files.
 - [Samtools](http://www.htslib.org/) - SAM/BAM manipulation.
 - [MACS](https://github.com/taoliu/MACS) - Peak caller.
 - [Rsubread](https://bioconductor.org/packages/release/bioc/html/Rsubread.html) - Annotating fragments to overlapping peaks.

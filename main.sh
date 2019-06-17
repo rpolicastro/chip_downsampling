@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source settings.conf
+
 #####################
 ## RIF Like Analysis
 #####################
@@ -7,13 +9,33 @@
 ## Preparing Run
 ## -------------
 
-## activating environment
+## making important directories
 
-conda activate chip-downsampling
+mkdir -p ${WORKDIR}/results
 
-## loading settings
+## download singularity container that contains conda environment
 
-source settings.conf
+mkdir -p ${WORKDIR}/results/container && cd ${WORKDIR}/results/container
+singularity pull shub://rpolicastro/chip_downsampling
+cd $REPDIR
+
+## activate singularity container
+
+singularity shell \
+-e -C \
+-B $WORKDIR, \
+$(dirname $BAM), \
+$REPDIR, \
+$(dirname $CONTROL) \
+${WORKDIR}/results/container/chip_downsampling_latest.sif
+
+## activate chip-downsampling conda environment from within container
+
+source activate chip-downsampling
+
+## shelling into container brings you back to root dir of container, so go back to script directory
+
+cd $REPDIR
 
 ## Downsampling BAM
 ## ----------------
